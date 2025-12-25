@@ -1,0 +1,4 @@
+::sysinit:/sbin/game_init
+::restart:/sbin/game_init
+::ctrlaltdel:/sbin/reboot
+::shutdown:/bin/umount -a -r

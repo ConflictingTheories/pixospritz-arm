@@ -1,0 +1,1 @@
+source "$BR2_EXTERNAL_RG353V_PATH/package/Config.in"

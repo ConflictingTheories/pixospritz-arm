@@ -1,0 +1,63 @@
+#!/bin/bash
+
+# Mount essential filesystems
+mount -t proc proc /proc
+mount -t sysfs sys /sys
+mount -t devtmpfs dev /dev
+mkdir -p /dev/pts /dev/shm
+mount -t devpts devpts /dev/pts
+mount -t tmpfs tmpfs /dev/shm
+
+# Create necessary directories
+mkdir -p /tmp /run /var/log
+
+# Set hostname
+hostname rg353v
+
+# Configure GPU permissions
+chmod 666 /dev/dri/card0 /dev/dri/renderD128 2>/dev/null || true
+
+# Unblank framebuffer
+echo 0 > /sys/class/graphics/fb0/blank 2>/dev/null || true
+
+# Set CPU governor to performance
+echo performance > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor 2>/dev/null || true
+echo performance > /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor 2>/dev/null || true
+echo performance > /sys/devices/system/cpu/cpu2/cpufreq/scaling_governor 2>/dev/null || true
+echo performance > /sys/devices/system/cpu/cpu3/cpufreq/scaling_governor 2>/dev/null || true
+
+# Initialize audio
+alsactl init 2>/dev/null || true
+amixer sset 'Headphone' 80% unmute 2>/dev/null || true
+amixer sset 'Playback' 80% unmute 2>/dev/null || true
+
+# Set environment variables for SDL2
+export SDL_VIDEODRIVER=kmsdrm
+export SDL_AUDIODRIVER=alsa
+export MESA_GL_VERSION_OVERRIDE=3.2
+export MESA_GLSL_VERSION_OVERRIDE=320
+
+# Start networking in background
+ifconfig lo up
+dhcpcd eth0 &
+
+# Log boot time
+echo "System booted at $(date)" > /var/log/boot.log
+
+# Launch game engine
+cd /opt/game
+if [ -f ./game_engine ]; then
+    echo "Launching game engine..." >> /var/log/boot.log
+    ./game_engine 2>&1 | tee /var/log/game.log
+else
+    echo "Game engine not found at /opt/game/game_engine" >> /var/log/boot.log
+    echo "Game engine not found!"
+    echo "Please copy your compiled engine to /opt/game/game_engine"
+    echo "Press any key to get a shell..."
+    read
+    /bin/bash
+fi
+
+# If game engine exits, provide shell
+echo "Game engine exited. Starting shell..."
+/bin/bash
