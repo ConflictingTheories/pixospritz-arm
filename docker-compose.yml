@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  buildroot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pixospritz-buildroot
+    volumes:
+      - ./rg353v-custom/buildroot/buildroot-2024.02.1/output:/workspace/rg353v-custom/buildroot/buildroot-2024.02.1/output
+      - ./rg353v-custom:/workspace/rg353v-custom
+    working_dir: /workspace/rg353v-custom/buildroot/buildroot-2024.02.1
+    environment:
+      - PARALLEL_JOBS=${PARALLEL_JOBS:-8}
+    # Keep container running so you can exec into it
+    stdin_open: true
+    tty: true
+    entrypoint: /bin/bash

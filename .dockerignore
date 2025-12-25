@@ -1,0 +1,33 @@
+# Exclude buildroot directory (will be downloaded fresh in container)
+rg353v-custom/buildroot/
+
+# Git files
+.git/
+.gitignore
+.gitattributes
+
+# Build artifacts
+*.o
+*.a
+*.so
+*.lo
+
+# macOS specific
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.log
+
+# Large files
+*.tar.gz
+*.zip
