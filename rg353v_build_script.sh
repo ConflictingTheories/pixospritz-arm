@@ -25,9 +25,27 @@ if [ ! -d "buildroot" ]; then
     rm "buildroot-${BUILDROOT_VERSION}.tar.gz"
 fi
 
-cd buildroot
+cd "$PROJECT_DIR"
 
-# Create custom defconfig
+# Create external.desc first (needed for BR2_EXTERNAL)
+cat > external.desc << 'EOF'
+name: RG353V
+desc: Custom Game Engine Distro for RG353V
+EOF
+
+# Create external.mk
+touch external.mk
+
+# Create Config.in
+cat > Config.in << 'EOF'
+source "$BR2_EXTERNAL_RG353V_PATH/package/Config.in"
+EOF
+
+mkdir -p package
+touch package/Config.in
+
+# Now create the defconfig in the external tree
+mkdir -p configs
 cat > configs/rg353v_defconfig << 'EOF'
 # Architecture
 BR2_aarch64=y
@@ -138,10 +156,9 @@ BR2_PACKAGE_GDB=y
 BR2_PACKAGE_STRACE=y
 EOF
 
-echo "Buildroot defconfig created."
+echo "Buildroot defconfig created in external tree."
 
-# Create external tree structure
-cd "$PROJECT_DIR"
+# Create board directory structure
 mkdir -p board/rg353v/{rootfs-overlay/{etc,opt,sbin},patches}
 
 # Create init script that launches game engine
@@ -338,6 +355,9 @@ image sdcard.img {
 }
 EOF
 
+# Now move back and create remaining external tree files
+cd "$PROJECT_DIR"
+
 # Create external.desc
 cat > external.desc << 'EOF'
 name: RG353V
@@ -364,7 +384,7 @@ echo "Next steps:"
 echo ""
 echo "1. Build the system:"
 echo "   cd $PROJECT_DIR/buildroot"
-echo "   make BR2_EXTERNAL=.. rg353v_defconfig"
+echo "   make BR2_EXTERNAL=$PROJECT_DIR rg353v_defconfig"
 echo "   make -j\$(nproc)"
 echo ""
 echo "2. Cross-compile your game engine:"
