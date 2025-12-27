@@ -20,6 +20,9 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     python3 \
     python3-dev \
+    bison \
+    flex \
+    gettext \
     && rm -rf /var/lib/apt/lists/*
 
 # Create work directory
@@ -55,6 +58,7 @@ WORKDIR /workspace/rg353v-custom/buildroot/buildroot-2024.02.1
 # Configure and build
 RUN echo "Starting Buildroot configuration..." && \
     make BR2_EXTERNAL=/workspace/rg353v-custom rg353v_defconfig && \
-    echo "Configuration complete. Starting build (this will take 1-2 hours)..." && \
-    make -j$(nproc) && \
+    echo "Configuration complete. Starting build (this will take 1-2 hours)..."
+
+RUN make -j$(nproc) && \
     echo "Build complete!"
