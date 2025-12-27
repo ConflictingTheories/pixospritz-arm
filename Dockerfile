@@ -23,6 +23,8 @@ RUN apt-get update && apt-get install -y \
     bison \
     flex \
     gettext \
+    swig \
+    device-tree-compiler \
     && rm -rf /var/lib/apt/lists/*
 
 # Create work directory
