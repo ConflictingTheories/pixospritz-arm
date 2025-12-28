@@ -2,7 +2,6 @@ FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV LINUX_KERNEL_VERSION=4.9.170
-ENV M8C_VERSION=1.7.10
 
 # Update GPG keys and install required packages
 RUN apt-get clean && \
@@ -32,7 +31,7 @@ RUN wget https://cdn.kernel.org/pub/linux/kernel/v4.x/linux-${LINUX_KERNEL_VERSI
     tar -xzf linux-${LINUX_KERNEL_VERSION}.tar.gz && \
     rm linux-${LINUX_KERNEL_VERSION}.tar.gz
 
-# No need to download m8c, we're building Pixospritz custom distro
+# Building Pixospritz custom distro
 
 # Download Knulli Linux config file
 RUN wget -O linux-sunxi64-legacy.config https://raw.githubusercontent.com/knulli-cfw/distribution/knulli-main/board/batocera/allwinner/h700/linux-sunxi64-legacy.config

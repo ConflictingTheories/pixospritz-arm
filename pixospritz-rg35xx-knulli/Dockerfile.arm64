@@ -33,7 +33,7 @@ RUN wget https://cdn.kernel.org/pub/linux/kernel/v4.x/linux-${LINUX_KERNEL_VERSI
     tar -xzf linux-${LINUX_KERNEL_VERSION}.tar.gz && \
     rm linux-${LINUX_KERNEL_VERSION}.tar.gz
 
-# No need to clone m8c, we're building Pixospritz custom distro
+# Building Pixospritz custom distro
 
 # Download Knulli Linux config file
 RUN wget -O linux-sunxi64-legacy.config https://raw.githubusercontent.com/knulli-cfw/distribution/knulli-main/board/batocera/allwinner/h700/linux-sunxi64-legacy.config
@@ -57,7 +57,7 @@ RUN mkdir -p /build/compiled/pixospritz
 RUN file /opt/aarch64--glibc--stable-2022.08-1/bin/aarch64-linux-gcc
 
 # Copy the ARM64-specific build script
-COPY m8c-rg35xx-knulli/build_script.arm64.sh /build/build_script.sh
+COPY build_script.arm64.sh /build/build_script.sh
 RUN chmod +x /build/build_script.sh && dos2unix /build/build_script.sh
 
 CMD ["/bin/bash", "/build/build_script.sh"]
