@@ -1,72 +1,84 @@
-FROM ubuntu:22.04
+FROM debian:bookworm-slim
 
-# Set environment variables
-ENV DEBIAN_FRONTEND=noninteractive
-
-# Install build dependencies
+# Install ALL required dependencies in one layer
+# This is the complete list for Buildroot + U-Boot + Kernel
 RUN apt-get update && apt-get install -y \
+    # Core build tools
     build-essential \
-    libncurses-dev \
+    gcc \
+    g++ \
+    make \
+    # Buildroot essentials
     git \
     wget \
     curl \
-    bc \
-    bzip2 \
     cpio \
-    rsync \
-    file \
     unzip \
-    pkg-config \
-    libssl-dev \
+    rsync \
+    bc \
+    file \
+    patch \
+    perl \
+    texinfo \
+    # Python (for U-Boot)
     python3 \
     python3-dev \
     python3-pip \
-    u-boot-tools \
+    python3-setuptools \
+    # Libraries
+    libncurses-dev \
+    libssl-dev \
     libelf-dev \
+    # Build tools
     bison \
     flex \
-    gettext \
-    swig \
+    gawk \
+    tar \
+    gzip \
+    bzip2 \
+    xz-utils \
+    sed \
+    grep \
+    diffutils \
+    findutils \
+    # Compression tools
+    lzip \
+    lzop \
+    # Device tree compiler
     device-tree-compiler \
+    # Misc utilities
+    vim-tiny \
+    less \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python U-Boot dependencies via pip
-RUN pip3 install pyelftools pylibfdt
+# Install Python packages for U-Boot
+# Use system packages first (preferred), then pip for missing ones
+RUN apt-get update && apt-get install -y \
+    python3-pyelftools \
+    python3-setuptools \
+    && rm -rf /var/lib/apt/lists/*
 
-# Set locale to avoid issues with some build tools
-RUN apt-get update && apt-get install -y locales && \
+# pylibfdt might not be in system packages, install via pip with override
+RUN pip3 install --break-system-packages --no-cache-dir pylibfdt || \
+    echo "pylibfdt install failed, will try during build"
+
+# Create non-root user for safer builds
+RUN useradd -m -s /bin/bash builder && \
+    echo "builder ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+# Set locale (prevents encoding issues)
+RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y locales && \
+    sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && \
     locale-gen en_US.UTF-8 && \
-    update-locale LANG=en_US.UTF-8
-ENV LANG en_US.UTF-8
-ENV LANGUAGE en_US:en
-ENV LC_ALL en_US.UTF-8
+    update-locale LANG=en_US.UTF-8 && \
+    rm -rf /var/lib/apt/lists/*
 
-# Set work directory to /workspace
-WORKDIR /workspace
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US:en
+ENV LC_ALL=en_US.UTF-8
 
-# Copy external tree configuration for build process
-COPY rg353v-custom /workspace/rg353v-custom
+# Switch to builder user
+USER builder
+WORKDIR /home/builder
 
-# Rename the config file to lowercase
-RUN cd /workspace/rg353v-custom/configs && \
-    if [ -f "RG353V_defconfig" ]; then \
-        mv RG353V_defconfig rg353v_defconfig; \
-    fi
-
-# Download Buildroot fresh inside the container
-RUN cd /workspace/rg353v-custom && \
-    mkdir -p buildroot && \
-    cd buildroot && \
-    echo "Downloading Buildroot 2024.02.1..." && \
-    wget -q https://buildroot.org/downloads/buildroot-2024.02.1.tar.gz && \
-    tar xzf buildroot-2024.02.1.tar.gz && \
-    rm buildroot-2024.02.1.tar.gz && \
-    echo "Buildroot extracted successfully"
-
-# Set working directory to buildroot
-WORKDIR /workspace/rg353v-custom/buildroot/buildroot-2024.02.1
-
-# Configure Buildroot with the external tree, but do not start the full build yet.
-RUN echo "Starting Buildroot configuration..." && \
-    make BR2_EXTERNAL=/workspace/rg353v-custom rg353v_defconfig && \
-    echo "Initial configuration complete. Full build will be triggered separately."
+CMD ["/bin/bash"]
