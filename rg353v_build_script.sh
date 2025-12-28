@@ -14,8 +14,9 @@ echo "2. Use Bootlin's prebuilt ARM64 toolchain"
 echo "3. Make the build MUCH faster and more reliable"
 echo ""
 
-BR_DIR="/workspace/rg353v-custom/buildroot/buildroot-2024.02.1"
-EXTERNAL_DIR="/workspace/rg353v-custom"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BR_DIR="$SCRIPT_DIR/rg353v-custom/buildroot/buildroot-2024.02.1"
+EXTERNAL_DIR="$SCRIPT_DIR/rg353v-custom"
 
 cd "$BR_DIR"
 
@@ -147,6 +148,27 @@ echo ""
 echo "Updated defconfig created!"
 echo ""
 echo "Now reconfiguring Buildroot..."
+# Fix PATH issues on macOS and use brew gcc
+export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+# Use brew gcc for HOSTCC if available
+if command -v gcc-15 >/dev/null 2>&1; then
+    export HOSTCC="gcc-15"
+    export HOSTCXX="g++-15"
+elif command -v gcc-14 >/dev/null 2>&1; then
+    export HOSTCC="gcc-14"
+    export HOSTCXX="g++-14"
+elif command -v gcc-13 >/dev/null 2>&1; then
+    export HOSTCC="gcc-13"
+    export HOSTCXX="g++-13"
+elif command -v gcc-12 >/dev/null 2>&1; then
+    export HOSTCC="gcc-12"
+    export HOSTCXX="g++-12"
+elif command -v gcc-11 >/dev/null 2>&1; then
+    export HOSTCC="gcc-11"
+    export HOSTCXX="g++-11"
+else
+    echo "Warning: No brew gcc found, using system gcc (may be clang)"
+fi
 make BR2_EXTERNAL="$EXTERNAL_DIR" rg353v_defconfig
 
 echo ""
@@ -158,7 +180,38 @@ echo "The external toolchain will be downloaded (about 100MB)"
 echo "This is MUCH faster than building binutils/gcc from scratch"
 echo ""
 echo "Ready to build. Running make -j4..."
-make -j4
+# Fix PATH issues on macOS and use brew gcc
+export PATH="/opt/homebrew/bin:/opt/homebrew/opt/gpatch/libexec/gnubin:/opt/homebrew/opt/findutils/libexec/gnubin:/opt/homebrew/opt/util-linux/bin:/opt/homebrew/opt/util-linux/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+# Use brew gcc for HOSTCC if available
+if command -v gcc-15 >/dev/null 2>&1; then
+    export HOSTCC="gcc-15"
+    export HOSTCXX="g++-15"
+    export CC="gcc-15"
+    export CXX="g++-15"
+elif command -v gcc-14 >/dev/null 2>&1; then
+    export HOSTCC="gcc-14"
+    export HOSTCXX="g++-14"
+    export CC="gcc-14"
+    export CXX="g++-14"
+elif command -v gcc-13 >/dev/null 2>&1; then
+    export HOSTCC="gcc-13"
+    export HOSTCXX="g++-13"
+    export CC="gcc-13"
+    export CXX="g++-13"
+elif command -v gcc-12 >/dev/null 2>&1; then
+    export HOSTCC="gcc-12"
+    export HOSTCXX="g++-12"
+    export CC="gcc-12"
+    export CXX="g++-12"
+elif command -v gcc-11 >/dev/null 2>&1; then
+    export HOSTCC="gcc-11"
+    export HOSTCXX="g++-11"
+    export CC="gcc-11"
+    export CXX="g++-11"
+else
+    echo "Warning: No brew gcc found, using system gcc (may be clang)"
+fi
+make HOSTCC="$HOSTCC" HOSTCXX="$HOSTCXX" CC="$CC" CXX="$CXX" -j4
 echo ""
 echo "=========================================="
 echo "Build Process Initiated!"
