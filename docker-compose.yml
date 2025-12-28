@@ -5,10 +5,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    platform: linux/amd64
     container_name: pixospritz-buildroot
     volumes:
-      - ./rg353v-custom/buildroot/buildroot-2024.02.1/output:/workspace/rg353v-custom/buildroot/buildroot-2024.02.1/output
-      - ./rg353v-custom:/workspace/rg353v-custom
+      - .:/workspace # Mount the entire project root to /workspace
     working_dir: /workspace/rg353v-custom/buildroot/buildroot-2024.02.1
     environment:
       - PARALLEL_JOBS=${PARALLEL_JOBS:-8}

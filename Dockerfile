@@ -20,6 +20,9 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     python3 \
     python3-dev \
+    python3-pip \
+    u-boot-tools \
+    libelf-dev \
     bison \
     flex \
     gettext \
@@ -27,16 +30,22 @@ RUN apt-get update && apt-get install -y \
     device-tree-compiler \
     && rm -rf /var/lib/apt/lists/*
 
-# Create work directory
+# Install Python U-Boot dependencies via pip
+RUN pip3 install pyelftools pylibfdt
+
+# Set locale to avoid issues with some build tools
+RUN apt-get update && apt-get install -y locales && \
+    locale-gen en_US.UTF-8 && \
+    update-locale LANG=en_US.UTF-8
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US:en
+ENV LC_ALL en_US.UTF-8
+
+# Set work directory to /workspace
 WORKDIR /workspace
 
-# Copy external tree configuration
-COPY rg353v-custom/board ./rg353v-custom/board
-COPY rg353v-custom/configs ./rg353v-custom/configs
-COPY rg353v-custom/package ./rg353v-custom/package
-COPY rg353v-custom/Config.in ./rg353v-custom/
-COPY rg353v-custom/external.desc ./rg353v-custom/
-COPY rg353v-custom/external.mk ./rg353v-custom/
+# Copy external tree configuration for build process
+COPY rg353v-custom /workspace/rg353v-custom
 
 # Rename the config file to lowercase
 RUN cd /workspace/rg353v-custom/configs && \
@@ -57,10 +66,7 @@ RUN cd /workspace/rg353v-custom && \
 # Set working directory to buildroot
 WORKDIR /workspace/rg353v-custom/buildroot/buildroot-2024.02.1
 
-# Configure and build
+# Configure Buildroot with the external tree, but do not start the full build yet.
 RUN echo "Starting Buildroot configuration..." && \
     make BR2_EXTERNAL=/workspace/rg353v-custom rg353v_defconfig && \
-    echo "Configuration complete. Starting build (this will take 1-2 hours)..."
-
-RUN make -j$(nproc) && \
-    echo "Build complete!"
+    echo "Initial configuration complete. Full build will be triggered separately."
