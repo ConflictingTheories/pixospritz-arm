@@ -5,7 +5,7 @@ set -e
 # Local paths
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BUILD_DIR="$PROJECT_DIR/pixospritz-rg35xx-knulli/output"
-WORKSPACE_DIR="$PROJECT_DIR/pixospritz-rg35xx-knulli"
+WORKSPACE_DIR="$PROJECT_DIR"
 
 # Create output directory
 mkdir -p "$BUILD_DIR/compiled/pixospritz"

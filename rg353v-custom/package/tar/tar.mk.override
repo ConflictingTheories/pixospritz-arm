@@ -1,0 +1,7 @@
+# Override tar to skip building and use system tar instead
+cat > "$BR_DIR/package/tar/tar.mk.override" << 'EOF'
+HOST_TAR = $(shell which gtar || which tar)
+HOST_TAR_DEPENDENCIES =
+
+$(eval $(host-virtual-package))
+EOF

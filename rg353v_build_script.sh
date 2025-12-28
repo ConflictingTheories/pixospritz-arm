@@ -12,6 +12,7 @@ echo "This will:"
 echo "1. Stop trying to build binutils/gcc from scratch"
 echo "2. Use Bootlin's prebuilt ARM64 toolchain"
 echo "3. Make the build MUCH faster and more reliable"
+echo "4. Patch host-tar to work on macOS"
 echo ""
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -23,6 +24,9 @@ cd "$BR_DIR"
 # Clean the failed build
 echo "Cleaning failed build artifacts..."
 make clean
+
+# Remove failed tar build if it exists
+rm -rf output/build/host-tar-1.34
 
 # Backup old defconfig
 if [ -f "$EXTERNAL_DIR/configs/rg353v_defconfig" ]; then
@@ -147,28 +151,91 @@ DEFCONFIG_EOF
 echo ""
 echo "Updated defconfig created!"
 echo ""
+
+# Fix tar issue on macOS - create symlink to system tar FIRST
+echo "Setting up system tar for Buildroot..."
+mkdir -p "$BR_DIR/output/host/bin"
+
+if command -v gtar >/dev/null 2>&1; then
+    echo "Using GNU tar (gtar) from Homebrew"
+    ln -sf $(which gtar) "$BR_DIR/output/host/bin/tar"
+elif command -v tar >/dev/null 2>&1; then
+    echo "Using system tar"
+    ln -sf $(which tar) "$BR_DIR/output/host/bin/tar"
+else
+    echo "ERROR: No tar found! Installing via Homebrew..."
+    brew install gnu-tar
+    ln -sf $(which gtar) "$BR_DIR/output/host/bin/tar"
+fi
+
+# Override tar package to skip building it entirely
+mkdir -p "$BR_DIR/package/tar"
+cat > "$BR_DIR/package/tar/tar.mk" << 'TAR_MK_EOF'
+################################################################################
+#
+# tar (using system tar - skip building)
+#
+################################################################################
+
+# Make this a virtual package that does nothing
+TAR_VERSION = 1.34
+
+# Don't download anything
+HOST_TAR_SOURCE =
+
+# Mark all stamps as done immediately
+define HOST_TAR_EXTRACT_CMDS
+	@echo "Using system tar"
+endef
+
+define HOST_TAR_CONFIGURE_CMDS
+	@echo "Skipping tar configure (using system tar)"
+endef
+
+define HOST_TAR_BUILD_CMDS
+	@echo "Skipping tar build (using system tar)"
+endef
+
+define HOST_TAR_INSTALL_CMDS
+	@echo "tar already available in output/host/bin"
+endef
+
+$(eval $(host-generic-package))
+TAR_MK_EOF
+
+echo "✓ tar setup complete (using system tar)"
+echo ""
 echo "Now reconfiguring Buildroot..."
-# Fix PATH issues on macOS and use brew gcc
-export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
-# Use brew gcc for HOSTCC if available
-if command -v gcc-15 >/dev/null 2>&1; then
-    export HOSTCC="gcc-15"
-    export HOSTCXX="g++-15"
-elif command -v gcc-14 >/dev/null 2>&1; then
+
+# Set up proper PATH for macOS with Homebrew
+export PATH="/opt/homebrew/bin:/opt/homebrew/opt/gpatch/libexec/gnubin:/opt/homebrew/opt/findutils/libexec/gnubin:/opt/homebrew/opt/gnu-sed/libexec/gnubin:/opt/homebrew/opt/coreutils/libexec/gnubin:/opt/homebrew/opt/util-linux/bin:/opt/homebrew/opt/util-linux/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+
+# Make sure we have GNU sed
+if ! command -v gsed >/dev/null 2>&1; then
+    echo "Installing gnu-sed via homebrew..."
+    brew install gnu-sed
+fi
+
+# Try to find and use brew gcc (14 or 13 are most stable on macOS)
+if command -v gcc-14 >/dev/null 2>&1; then
     export HOSTCC="gcc-14"
     export HOSTCXX="g++-14"
+    echo "Using gcc-14 from Homebrew"
 elif command -v gcc-13 >/dev/null 2>&1; then
     export HOSTCC="gcc-13"
     export HOSTCXX="g++-13"
-elif command -v gcc-12 >/dev/null 2>&1; then
-    export HOSTCC="gcc-12"
-    export HOSTCXX="g++-12"
-elif command -v gcc-11 >/dev/null 2>&1; then
-    export HOSTCC="gcc-11"
-    export HOSTCXX="g++-11"
+    echo "Using gcc-13 from Homebrew"
+elif command -v gcc-15 >/dev/null 2>&1; then
+    export HOSTCC="gcc-15"
+    export HOSTCXX="g++-15"
+    echo "Using gcc-15 from Homebrew (may have compatibility issues)"
 else
     echo "Warning: No brew gcc found, using system gcc (may be clang)"
+    export HOSTCC="gcc"
+    export HOSTCXX="g++"
 fi
+
+# Apply defconfig
 make BR2_EXTERNAL="$EXTERNAL_DIR" rg353v_defconfig
 
 echo ""
@@ -179,42 +246,13 @@ echo ""
 echo "The external toolchain will be downloaded (about 100MB)"
 echo "This is MUCH faster than building binutils/gcc from scratch"
 echo ""
-echo "Ready to build. Running make -j4..."
-# Fix PATH issues on macOS and use brew gcc
-export PATH="/opt/homebrew/bin:/opt/homebrew/opt/gpatch/libexec/gnubin:/opt/homebrew/opt/findutils/libexec/gnubin:/opt/homebrew/opt/util-linux/bin:/opt/homebrew/opt/util-linux/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
-# Use brew gcc for HOSTCC if available
-if command -v gcc-15 >/dev/null 2>&1; then
-    export HOSTCC="gcc-15"
-    export HOSTCXX="g++-15"
-    export CC="gcc-15"
-    export CXX="g++-15"
-elif command -v gcc-14 >/dev/null 2>&1; then
-    export HOSTCC="gcc-14"
-    export HOSTCXX="g++-14"
-    export CC="gcc-14"
-    export CXX="g++-14"
-elif command -v gcc-13 >/dev/null 2>&1; then
-    export HOSTCC="gcc-13"
-    export HOSTCXX="g++-13"
-    export CC="gcc-13"
-    export CXX="g++-13"
-elif command -v gcc-12 >/dev/null 2>&1; then
-    export HOSTCC="gcc-12"
-    export HOSTCXX="g++-12"
-    export CC="gcc-12"
-    export CXX="g++-12"
-elif command -v gcc-11 >/dev/null 2>&1; then
-    export HOSTCC="gcc-11"
-    export HOSTCXX="g++-11"
-    export CC="gcc-11"
-    export CXX="g++-11"
-else
-    echo "Warning: No brew gcc found, using system gcc (may be clang)"
-fi
-make HOSTCC="$HOSTCC" HOSTCXX="$HOSTCXX" CC="$CC" CXX="$CXX" -j4
+echo "Ready to build. Running make..."
+
+# Build with proper flags
+make -j$(sysctl -n hw.ncpu) 2>&1 | tee build.log
+
 echo ""
 echo "=========================================="
-echo "Build Process Initiated!"
+echo "Build Process Complete!"
 echo "=========================================="
-echo "Monitor the build process. It should now complete without U-Boot/binutils errors."
-echo "The entire process will take about 30-45 minutes."
+echo "Check build.log for any issues."

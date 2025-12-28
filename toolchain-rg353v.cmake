@@ -1,13 +1,13 @@
 set(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_SYSTEM_PROCESSOR aarch64)
 
-# Set the toolchain paths to Bootlin toolchain
-set(TOOLCHAIN_PREFIX "/opt/aarch64--glibc--stable-2022.08-1")
-set(CMAKE_SYSROOT "${TOOLCHAIN_PREFIX}/aarch64-linux/sysroot")
+# Set the toolchain paths to Buildroot output
+set(TOOLCHAIN_PREFIX "${CMAKE_CURRENT_LIST_DIR}/../rg353v-custom/buildroot/buildroot-2024.02.1/output/host")
+set(CMAKE_SYSROOT "${CMAKE_CURRENT_LIST_DIR}/../rg353v-custom/buildroot/buildroot-2024.02.1/output/staging")
 
 # Specify the cross compilers
-set(CMAKE_C_COMPILER "${TOOLCHAIN_PREFIX}/bin/aarch64-linux-gcc")
-set(CMAKE_CXX_COMPILER "${TOOLCHAIN_PREFIX}/bin/aarch64-linux-g++")
+set(CMAKE_C_COMPILER "${TOOLCHAIN_PREFIX}/bin/aarch64-buildroot-linux-gnu-gcc")
+set(CMAKE_CXX_COMPILER "${TOOLCHAIN_PREFIX}/bin/aarch64-buildroot-linux-gnu-g++")
 
 # Set CMAKE_FIND_ROOT_PATH
 set(CMAKE_FIND_ROOT_PATH "${CMAKE_SYSROOT}")

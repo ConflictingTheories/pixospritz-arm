@@ -1,0 +1,26 @@
+--- gnu/argp-fmtstream.h
++++ gnu/argp-fmtstream.h
+@@ -29,7 +29,9 @@
+ #include <string.h>
+ #include <unistd.h>
+
+-#ifndef ARGP_FS_EI
++#undef ARGP_FS_EI
++#undef ARGP_EI
++#if 0
+ # define ARGP_FS_EI _GL_EXTERN_INLINE
+ #endif
+
+--- gnu/argp.h
++++ gnu/argp.h
+@@ -560,7 +560,9 @@
+    the real header file to do its thing.  ARGP_EI is defined rather like
+    _EXTERN_INLINE from the gnulib, but without the MSVC check, as MSVC
+    doesn't currently support C99.  */
+-# ifndef ARGP_EI
++# undef ARGP_EI
++# undef ARGP_FS_EI
++# if 0
+ #  define ARGP_EI _GL_EXTERN_INLINE
+ # endif
+ 
