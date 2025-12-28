@@ -1,18 +1,20 @@
 version: '3.8'
 
 services:
-  buildroot:
+  pixospritz-build:
     build:
-      context: .
-      dockerfile: Dockerfile
-    platform: linux/amd64
-    container_name: pixospritz-buildroot
+      context: ./pixospritz-rg35xx-knulli
+      dockerfile: Dockerfile.arm64
+    platform: linux/arm64
+    container_name: pixospritz-build
     volumes:
       - .:/workspace # Mount the entire project root to /workspace
-    working_dir: /workspace/rg353v-custom/buildroot/buildroot-2024.02.1
+    working_dir: /build
     environment:
-      - PARALLEL_JOBS=${PARALLEL_JOBS:-8}
+      - LINUX_KERNEL_VERSION=4.9.170
     # Keep container running so you can exec into it
     stdin_open: true
     tty: true
     entrypoint: /bin/bash
+    mem_limit: 8g
+    mem_reservation: 4g

@@ -1,0 +1,63 @@
+FROM --platform=linux/arm64 ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV LINUX_KERNEL_VERSION=4.9.170
+
+# Update and install required packages
+RUN apt-get update && apt-get install -y \
+    wget \
+    tar \
+    make \
+    gcc \
+    sed \
+    ca-certificates \
+    bc \
+    libssl-dev \
+    pkg-config \
+    dos2unix \
+    libsdl2-dev \
+    build-essential \
+    git \
+    python3 \
+    libserialport-dev \
+    autoconf \
+    automake \
+    libtool \
+    cmake \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /build
+
+# Download and extract Linux kernel
+RUN wget https://cdn.kernel.org/pub/linux/kernel/v4.x/linux-${LINUX_KERNEL_VERSION}.tar.gz && \
+    tar -xzf linux-${LINUX_KERNEL_VERSION}.tar.gz && \
+    rm linux-${LINUX_KERNEL_VERSION}.tar.gz
+
+# No need to clone m8c, we're building Pixospritz custom distro
+
+# Download Knulli Linux config file
+RUN wget -O linux-sunxi64-legacy.config https://raw.githubusercontent.com/knulli-cfw/distribution/knulli-main/board/batocera/allwinner/h700/linux-sunxi64-legacy.config
+
+# Download and extract Bootlin ARM64 toolchain
+RUN wget https://toolchains.bootlin.com/downloads/releases/toolchains/aarch64/tarballs/aarch64--glibc--stable-2022.08-1.tar.bz2 && \
+    tar -xjf aarch64--glibc--stable-2022.08-1.tar.bz2 -C /opt && \
+    rm aarch64--glibc--stable-2022.08-1.tar.bz2
+
+# Set up environment variables for cross-compilation
+ENV PATH=/opt/aarch64--glibc--stable-2022.08-1/bin:$PATH
+ENV CC=aarch64-linux-gcc
+ENV CXX=aarch64-linux-g++
+ENV PKG_CONFIG_PATH=/usr/lib/aarch64-linux-gnu/pkgconfig
+ENV SDL_CONFIG=/usr/bin/sdl2-config
+
+# Ensure the output directory exists
+RUN mkdir -p /build/compiled/pixospritz
+
+# Check the architecture of the cross-compiler
+RUN file /opt/aarch64--glibc--stable-2022.08-1/bin/aarch64-linux-gcc
+
+# Copy the ARM64-specific build script
+COPY m8c-rg35xx-knulli/build_script.arm64.sh /build/build_script.sh
+RUN chmod +x /build/build_script.sh && dos2unix /build/build_script.sh
+
+CMD ["/bin/bash", "/build/build_script.sh"]
