@@ -1,4 +1,289 @@
 /usr/bin/make -j1  O=/home/builder/work/rg353v-custom/buildroot/output HOSTCC="/usr/bin/gcc" HOSTCXX="/usr/bin/g++" syncconfig
 make[1]: warning: -j1 forced in submake: resetting jobserver mode.
 make[1]: Entering directory '/home/builder/work/rg353v-custom/buildroot'
-make[1]: Warning: File '/home/builder/work/rg353v-custom/buildroot/output/.br2-external.mk' has modification time 0.0044 s in the future
+package/dvdrw-tools/Config.in:41:warning: choice value used outside its choice group
+package/dvdrw-tools/Config.in:47:warning: choice value used outside its choice group
+package/espeak/Config.in:26:warning: choice value used outside its choice group
+package/espeak/Config.in:29:warning: choice value used outside its choice group
+package/espeak/Config.in:37:warning: choice value used outside its choice group
+package/kodi/Config.in:210:warning: choice value used outside its choice group
+package/kodi/Config.in:215:warning: choice value used outside its choice group
+package/mimic/Config.in:22:warning: choice value used outside its choice group
+package/mimic/Config.in:28:warning: choice value used outside its choice group
+package/mimic/Config.in:32:warning: choice value used outside its choice group
+package/mimic/Config.in:36:warning: choice value used outside its choice group
+package/mpd/Config.in:398:warning: choice value used outside its choice group
+package/mpd/Config.in:409:warning: choice value used outside its choice group
+package/mpd/Config.in:422:warning: choice value used outside its choice group
+package/p7zip/Config.in:22:warning: choice value used outside its choice group
+package/p7zip/Config.in:28:warning: choice value used outside its choice group
+package/glslsandbox-player/Config.in:66:warning: choice value used outside its choice group
+package/glslsandbox-player/Config.in:71:warning: choice value used outside its choice group
+package/glslsandbox-player/Config.in:77:warning: choice value used outside its choice group
+package/glslsandbox-player/Config.in:81:warning: choice value used outside its choice group
+package/glslsandbox-player/Config.in:85:warning: choice value used outside its choice group
+package/glslsandbox-player/Config.in:89:warning: choice value used outside its choice group
+package/glslsandbox-player/Config.in:93:warning: choice value used outside its choice group
+package/glslsandbox-player/Config.in:97:warning: choice value used outside its choice group
+package/glslsandbox-player/Config.in:101:warning: choice value used outside its choice group
+package/glslsandbox-player/Config.in:105:warning: choice value used outside its choice group
+package/netsurf/Config.in:38:warning: choice value used outside its choice group
+package/netsurf/Config.in:44:warning: choice value used outside its choice group
+package/netsurf/Config.in:50:warning: choice value used outside its choice group
+package/efl/Config.in:209:warning: choice value used outside its choice group
+package/efl/Config.in:218:warning: choice value used outside its choice group
+package/efl/Config.in:226:warning: choice value used outside its choice group
+package/qt5/qt5base/Config.in:97:warning: choice value used outside its choice group
+package/qt5/qt5base/Config.in:102:warning: choice value used outside its choice group
+package/qt5/qt5base/Config.in:107:warning: choice value used outside its choice group
+package/qt5/qt5base/Config.in:160:warning: choice value used outside its choice group
+package/qt5/qt5base/Config.in:166:warning: choice value used outside its choice group
+package/qt6/qt6base/Config.in:110:warning: choice value used outside its choice group
+package/qt6/qt6base/Config.in:116:warning: choice value used outside its choice group
+package/weston/Config.in:40:warning: choice value used outside its choice group
+package/weston/Config.in:44:warning: choice value used outside its choice group
+package/weston/Config.in:48:warning: choice value used outside its choice group
+package/weston/Config.in:57:warning: choice value used outside its choice group
+package/weston/Config.in:61:warning: choice value used outside its choice group
+package/x11r7/xserver_xorg-server/Config.in:48:warning: choice value used outside its choice group
+package/x11r7/xserver_xorg-server/Config.in:64:warning: choice value used outside its choice group
+package/b43-firmware/Config.in:18:warning: choice value used outside its choice group
+package/b43-firmware/Config.in:21:warning: choice value used outside its choice group
+package/murata-cyw-fw/Config.in:36:warning: choice value used outside its choice group
+package/murata-cyw-fw/Config.in:39:warning: choice value used outside its choice group
+package/murata-cyw-fw/Config.in:53:warning: choice value used outside its choice group
+package/murata-cyw-fw/Config.in:56:warning: choice value used outside its choice group
+package/murata-cyw-fw/Config.in:59:warning: choice value used outside its choice group
+package/murata-cyw-fw/Config.in:72:warning: choice value used outside its choice group
+package/murata-cyw-fw/Config.in:75:warning: choice value used outside its choice group
+package/murata-cyw-fw/Config.in:78:warning: choice value used outside its choice group
+package/esp-hosted/Config.in:24:warning: choice value used outside its choice group
+package/esp-hosted/Config.in:27:warning: choice value used outside its choice group
+package/esp-hosted/Config.in:38:warning: choice value used outside its choice group
+package/esp-hosted/Config.in:41:warning: choice value used outside its choice group
+package/freescale-imx/Config.in:14:warning: choice value used outside its choice group
+package/freescale-imx/Config.in:17:warning: choice value used outside its choice group
+package/freescale-imx/Config.in:20:warning: choice value used outside its choice group
+package/freescale-imx/Config.in:23:warning: choice value used outside its choice group
+package/freescale-imx/Config.in:26:warning: choice value used outside its choice group
+package/freescale-imx/Config.in:29:warning: choice value used outside its choice group
+package/freescale-imx/Config.in:32:warning: choice value used outside its choice group
+package/freescale-imx/Config.in:35:warning: choice value used outside its choice group
+package/freescale-imx/Config.in:38:warning: choice value used outside its choice group
+package/freescale-imx/Config.in:41:warning: choice value used outside its choice group
+package/freescale-imx/Config.in:44:warning: choice value used outside its choice group
+package/freescale-imx/Config.in:47:warning: choice value used outside its choice group
+package/freescale-imx/Config.in:50:warning: choice value used outside its choice group
+package/freescale-imx/Config.in:53:warning: choice value used outside its choice group
+package/freescale-imx/Config.in:56:warning: choice value used outside its choice group
+package/freescale-imx/Config.in:59:warning: choice value used outside its choice group
+package/freescale-imx/Config.in:62:warning: choice value used outside its choice group
+package/freescale-imx/Config.in:65:warning: choice value used outside its choice group
+package/freescale-imx/Config.in:68:warning: choice value used outside its choice group
+package/freescale-imx/Config.in:83:warning: choice value used outside its choice group
+package/freescale-imx/Config.in:86:warning: choice value used outside its choice group
+package/freescale-imx/firmware-imx/Config.in:75:warning: choice value used outside its choice group
+package/freescale-imx/firmware-imx/Config.in:80:warning: choice value used outside its choice group
+package/freescale-imx/firmware-imx/Config.in:85:warning: choice value used outside its choice group
+package/freescale-imx/imx-seco/Config.in:26:warning: choice value used outside its choice group
+package/freescale-imx/imx-seco/Config.in:30:warning: choice value used outside its choice group
+package/freescale-imx/imx-seco/Config.in:34:warning: choice value used outside its choice group
+package/freescale-imx/imx-seco/Config.in:38:warning: choice value used outside its choice group
+package/freescale-imx/imx-seco/Config.in:42:warning: choice value used outside its choice group
+package/freescale-imx/imx-seco/Config.in:46:warning: choice value used outside its choice group
+package/freescale-imx/gpu-amd-bin-mx51/Config.in:29:warning: choice value used outside its choice group
+package/freescale-imx/gpu-amd-bin-mx51/Config.in:42:warning: choice value used outside its choice group
+package/freescale-imx/imx-gpu-viv/Config.in:47:warning: choice value used outside its choice group
+package/freescale-imx/imx-gpu-viv/Config.in:52:warning: choice value used outside its choice group
+package/linux-backports/Config.in:22:warning: choice value used outside its choice group
+package/linux-backports/Config.in:25:warning: choice value used outside its choice group
+package/linux-backports/Config.in:34:warning: choice value used outside its choice group
+package/linux-backports/Config.in:37:warning: choice value used outside its choice group
+package/openpowerlink/Config.in:28:warning: choice value used outside its choice group
+package/openpowerlink/Config.in:33:warning: choice value used outside its choice group
+package/openpowerlink/Config.in:45:warning: choice value used outside its choice group
+package/openpowerlink/Config.in:53:warning: choice value used outside its choice group
+package/openpowerlink/Config.in:64:warning: choice value used outside its choice group
+package/openpowerlink/Config.in:73:warning: choice value used outside its choice group
+package/sunxi-mali-utgard/Config.in:33:warning: choice value used outside its choice group
+package/sunxi-mali-utgard/Config.in:35:warning: choice value used outside its choice group
+package/sunxi-mali-utgard/Config.in:51:warning: choice value used outside its choice group
+package/sunxi-mali-utgard/Config.in:54:warning: choice value used outside its choice group
+package/ti-gfx/Config.in:59:warning: choice value used outside its choice group
+package/ti-gfx/Config.in:64:warning: choice value used outside its choice group
+package/ti-gfx/Config.in:69:warning: choice value used outside its choice group
+package/ti-gfx/Config.in:74:warning: choice value used outside its choice group
+package/lua/Config.in:23:warning: choice value used outside its choice group
+package/lua/Config.in:29:warning: choice value used outside its choice group
+package/lua/Config.in:33:warning: choice value used outside its choice group
+package/lua/Config.in:68:warning: choice value used outside its choice group
+package/lua/Config.in:73:warning: choice value used outside its choice group
+package/lua/Config.in:80:warning: choice value used outside its choice group
+package/openjdk/Config.in:67:warning: choice value used outside its choice group
+package/openjdk/Config.in:70:warning: choice value used outside its choice group
+package/openjdk/Config.in:135:warning: choice value used outside its choice group
+package/openjdk/Config.in:141:warning: choice value used outside its choice group
+package/openjdk/Config.in:147:warning: choice value used outside its choice group
+package/python3/Config.in:29:warning: choice value used outside its choice group
+package/python3/Config.in:32:warning: choice value used outside its choice group
+package/python3/Config.in:35:warning: choice value used outside its choice group
+package/libmad/Config.in:17:warning: choice value used outside its choice group
+package/libmad/Config.in:22:warning: choice value used outside its choice group
+package/libmad/Config.in:27:warning: choice value used outside its choice group
+package/zlib/Config.in:28:warning: choice value used outside its choice group
+package/zlib/Config.in:37:warning: choice value used outside its choice group
+package/libssh/Config.in:29:warning: choice value used outside its choice group
+package/libssh/Config.in:33:warning: choice value used outside its choice group
+package/libssh/Config.in:37:warning: choice value used outside its choice group
+package/libssh2/Config.in:20:warning: choice value used outside its choice group
+package/libssh2/Config.in:24:warning: choice value used outside its choice group
+package/libssh2/Config.in:28:warning: choice value used outside its choice group
+package/openssl/Config.in:18:warning: choice value used outside its choice group
+package/openssl/Config.in:34:warning: choice value used outside its choice group
+package/jpeg/Config.in:24:warning: choice value used outside its choice group
+package/jpeg/Config.in:32:warning: choice value used outside its choice group
+package/libmediaart/Config.in:24:warning: choice value used outside its choice group
+package/libmediaart/Config.in:28:warning: choice value used outside its choice group
+package/opencv3/Config.in:64:warning: choice value used outside its choice group
+package/opencv3/Config.in:67:warning: choice value used outside its choice group
+package/opencv3/Config.in:76:warning: choice value used outside its choice group
+package/opencv3/Config.in:85:warning: choice value used outside its choice group
+package/opencv4/Config.in:80:warning: choice value used outside its choice group
+package/opencv4/Config.in:83:warning: choice value used outside its choice group
+package/opencv4/Config.in:92:warning: choice value used outside its choice group
+package/opencv4/Config.in:101:warning: choice value used outside its choice group
+package/opencv4/Config.in:298:warning: choice value used outside its choice group
+package/opencv4/Config.in:301:warning: choice value used outside its choice group
+package/opencv4/Config.in:311:warning: choice value used outside its choice group
+package/jquery-ui-themes/Config.in:17:warning: choice value used outside its choice group
+package/jquery-ui-themes/Config.in:20:warning: choice value used outside its choice group
+package/jquery-ui-themes/Config.in:23:warning: choice value used outside its choice group
+package/jquery-ui-themes/Config.in:26:warning: choice value used outside its choice group
+package/jquery-ui-themes/Config.in:29:warning: choice value used outside its choice group
+package/jquery-ui-themes/Config.in:32:warning: choice value used outside its choice group
+package/jquery-ui-themes/Config.in:35:warning: choice value used outside its choice group
+package/jquery-ui-themes/Config.in:38:warning: choice value used outside its choice group
+package/jquery-ui-themes/Config.in:41:warning: choice value used outside its choice group
+package/jquery-ui-themes/Config.in:44:warning: choice value used outside its choice group
+package/jquery-ui-themes/Config.in:47:warning: choice value used outside its choice group
+package/jquery-ui-themes/Config.in:50:warning: choice value used outside its choice group
+package/jquery-ui-themes/Config.in:53:warning: choice value used outside its choice group
+package/jquery-ui-themes/Config.in:56:warning: choice value used outside its choice group
+package/jquery-ui-themes/Config.in:59:warning: choice value used outside its choice group
+package/jquery-ui-themes/Config.in:62:warning: choice value used outside its choice group
+package/jquery-ui-themes/Config.in:65:warning: choice value used outside its choice group
+package/jquery-ui-themes/Config.in:68:warning: choice value used outside its choice group
+package/jquery-ui-themes/Config.in:71:warning: choice value used outside its choice group
+package/jquery-ui-themes/Config.in:74:warning: choice value used outside its choice group
+package/jquery-ui-themes/Config.in:77:warning: choice value used outside its choice group
+package/jquery-ui-themes/Config.in:80:warning: choice value used outside its choice group
+package/jquery-ui-themes/Config.in:83:warning: choice value used outside its choice group
+package/jquery-ui-themes/Config.in:86:warning: choice value used outside its choice group
+package/fmlib/Config.in:25:warning: choice value used outside its choice group
+package/fmlib/Config.in:29:warning: choice value used outside its choice group
+package/fmlib/Config.in:33:warning: choice value used outside its choice group
+package/libcurl/Config.in:63:warning: choice value used outside its choice group
+package/libcurl/Config.in:67:warning: choice value used outside its choice group
+package/libcurl/Config.in:71:warning: choice value used outside its choice group
+package/libcurl/Config.in:75:warning: choice value used outside its choice group
+package/libcurl/Config.in:79:warning: choice value used outside its choice group
+package/libcurl/Config.in:89:warning: choice value used outside its choice group
+package/open62541/Config.in:17:warning: choice value used outside its choice group
+package/open62541/Config.in:20:warning: choice value used outside its choice group
+package/open62541/Config.in:24:warning: choice value used outside its choice group
+package/open62541/Config.in:37:warning: choice value used outside its choice group
+package/open62541/Config.in:42:warning: choice value used outside its choice group
+package/open62541/Config.in:50:warning: choice value used outside its choice group
+package/open62541/Config.in:55:warning: choice value used outside its choice group
+package/armadillo/Config.in:27:warning: choice value used outside its choice group
+package/armadillo/Config.in:32:warning: choice value used outside its choice group
+package/apache/Config.in:27:warning: choice value used outside its choice group
+package/apache/Config.in:33:warning: choice value used outside its choice group
+package/apache/Config.in:38:warning: choice value used outside its choice group
+package/connman/Config.in:27:warning: choice value used outside its choice group
+package/connman/Config.in:33:warning: choice value used outside its choice group
+package/rygel/Config.in:46:warning: choice value used outside its choice group
+package/rygel/Config.in:49:warning: choice value used outside its choice group
+package/strongswan/Config.in:35:warning: choice value used outside its choice group
+package/strongswan/Config.in:47:warning: choice value used outside its choice group
+package/strongswan/Config.in:51:warning: choice value used outside its choice group
+package/strongswan/Config.in:56:warning: choice value used outside its choice group
+package/strongswan/Config.in:60:warning: choice value used outside its choice group
+package/zabbix/Config.in:39:warning: choice value used outside its choice group
+package/zabbix/Config.in:45:warning: choice value used outside its choice group
+package/xenomai/Config.in:54:warning: choice value used outside its choice group
+package/xenomai/Config.in:57:warning: choice value used outside its choice group
+package/xenomai/Config.in:60:warning: choice value used outside its choice group
+package/xenomai/Config.in:63:warning: choice value used outside its choice group
+package/xenomai/Config.in:103:warning: choice value used outside its choice group
+package/xenomai/Config.in:110:warning: choice value used outside its choice group
+package/refpolicy/Config.in:38:warning: choice value used outside its choice group
+package/refpolicy/Config.in:51:warning: choice value used outside its choice group
+package/refpolicy/Config.in:81:warning: choice value used outside its choice group
+package/refpolicy/Config.in:86:warning: choice value used outside its choice group
+package/refpolicy/Config.in:91:warning: choice value used outside its choice group
+package/xvisor/Config.in:27:warning: choice value used outside its choice group
+package/xvisor/Config.in:30:warning: choice value used outside its choice group
+package/espeak/Config.in:23:warning: choice default symbol 'BR2_PACKAGE_ESPEAK_AUDIO_BACKEND_NONE' is not contained in the choice
+package/kodi/Config.in:207:warning: choice default symbol 'BR2_PACKAGE_KODI_RENDER_SYSTEM_GL' is not contained in the choice
+package/mimic/Config.in:19:warning: choice default symbol 'BR2_PACKAGE_MIMIC_AUDIO_BACKEND_NONE' is not contained in the choice
+package/mpd/Config.in:389:warning: choice default symbol 'BR2_PACKAGE_MPD_UPNP_PUPNP' is not contained in the choice
+package/mpd/Config.in:390:warning: choice default symbol 'BR2_PACKAGE_MPD_UPNP_DISABLED' is not contained in the choice
+package/p7zip/Config.in:19:warning: choice default symbol 'BR2_PACKAGE_P7ZIP_7ZR' is not contained in the choice
+package/glslsandbox-player/Config.in:54:warning: choice default symbol 'BR2_PACKAGE_GLSLSANDBOX_PLAYER_MALI' is not contained in the choice
+package/glslsandbox-player/Config.in:55:warning: choice default symbol 'BR2_PACKAGE_GLSLSANDBOX_PLAYER_MALI_T76X' is not contained in the choice
+package/glslsandbox-player/Config.in:56:warning: choice default symbol 'BR2_PACKAGE_GLSLSANDBOX_PLAYER_RPI' is not contained in the choice
+package/glslsandbox-player/Config.in:57:warning: choice default symbol 'BR2_PACKAGE_GLSLSANDBOX_PLAYER_SDL2' is not contained in the choice
+package/glslsandbox-player/Config.in:58:warning: choice default symbol 'BR2_PACKAGE_GLSLSANDBOX_PLAYER_TISGX' is not contained in the choice
+package/glslsandbox-player/Config.in:59:warning: choice default symbol 'BR2_PACKAGE_GLSLSANDBOX_PLAYER_VIVFB' is not contained in the choice
+package/glslsandbox-player/Config.in:60:warning: choice default symbol 'BR2_PACKAGE_GLSLSANDBOX_PLAYER_WL' is not contained in the choice
+package/glslsandbox-player/Config.in:61:warning: choice default symbol 'BR2_PACKAGE_GLSLSANDBOX_PLAYER_X11' is not contained in the choice
+package/netsurf/Config.in:35:warning: choice default symbol 'BR2_PACKAGE_NETSURF_SDL' is not contained in the choice
+package/qt5/qt5base/Config.in:92:warning: choice default symbol 'BR2_PACKAGE_QT5BASE_SQLITE_NONE' is not contained in the choice
+package/b43-firmware/Config.in:11:warning: choice default symbol 'BR2_PACKAGE_B43_FIRMWARE_KERNEL_AFTER_3_2' is not contained in the choice
+package/esp-hosted/Config.in:19:warning: choice default symbol 'BR2_PACKAGE_ESP_HOSTED_SDIO' is not contained in the choice
+package/esp-hosted/Config.in:33:warning: choice default symbol 'BR2_PACKAGE_ESP_HOSTED_TARGET_ESP32' is not contained in the choice
+package/freescale-imx/Config.in:74:warning: choice default symbol 'BR2_PACKAGE_FREESCALE_IMX_PLATFORM_IMX93A1' is not contained in the choice
+package/freescale-imx/firmware-imx/Config.in:68:warning: choice default symbol 'BR2_PACKAGE_FIRMWARE_IMX_LPDDR4' is not contained in the choice
+package/freescale-imx/imx-seco/Config.in:16:warning: choice default symbol 'BR2_PACKAGE_IMX_SECO_MX8QMB0' is not contained in the choice
+package/freescale-imx/imx-seco/Config.in:17:warning: choice default symbol 'BR2_PACKAGE_IMX_SECO_MX8QXC0' is not contained in the choice
+package/freescale-imx/imx-seco/Config.in:18:warning: choice default symbol 'BR2_PACKAGE_IMX_SECO_MX8DXLB0' is not contained in the choice
+package/linux-backports/Config.in:17:warning: choice default symbol 'BR2_PACKAGE_LINUX_BACKPORTS_5_15_X' is not contained in the choice
+package/linux-backports/Config.in:31:warning: choice default symbol 'BR2_PACKAGE_LINUX_BACKPORTS_USE_DEFCONFIG' is not contained in the choice
+package/openpowerlink/Config.in:41:warning: choice default symbol 'BR2_PACKAGE_OPENPOWERLINK_STACK_KERNEL_STACK_LIB' is not contained in the choice
+package/openpowerlink/Config.in:42:warning: choice default symbol 'BR2_PACKAGE_OPENPOWERLINK_STACK_USERSPACE_DAEMON_LIB' is not contained in the choice
+package/sunxi-mali-utgard/Config.in:26:warning: choice default symbol 'BR2_PACKAGE_SUNXI_MALI_UTGARD_R6P2' is not contained in the choice
+package/sunxi-mali-utgard/Config.in:27:warning: choice default symbol 'BR2_PACKAGE_SUNXI_MALI_UTGARD_R8P1' is not contained in the choice
+package/sunxi-mali-utgard/Config.in:28:warning: choice default symbol 'BR2_PACKAGE_SUNXI_MALI_UTGARD_R6P2' is not contained in the choice
+package/sunxi-mali-utgard/Config.in:46:warning: choice default symbol 'BR2_PACKAGE_SUNXI_MALI_UTGARD_FBDEV' is not contained in the choice
+package/ti-gfx/Config.in:52:warning: choice default symbol 'BR2_PACKAGE_TI_GFX_ES3' is not contained in the choice
+package/lua/Config.in:17:warning: choice default symbol 'BR2_PACKAGE_LUA_5_3' is not contained in the choice
+package/lua/Config.in:18:warning: choice default symbol 'BR2_PACKAGE_LUA_5_4' is not contained in the choice
+package/lua/Config.in:65:warning: choice default symbol 'BR2_PACKAGE_LUA_EDITING_NONE' is not contained in the choice
+package/openjdk/Config.in:60:warning: choice default symbol 'BR2_PACKAGE_OPENJDK_VERSION_17' is not contained in the choice
+package/openjdk/Config.in:61:warning: choice default symbol 'BR2_PACKAGE_OPENJDK_VERSION_21' is not contained in the choice
+package/openjdk/Config.in:62:warning: choice default symbol 'BR2_PACKAGE_OPENJDK_VERSION_21' is not contained in the choice
+package/openjdk/Config.in:130:warning: choice default symbol 'BR2_PACKAGE_OPENJDK_JVM_VARIANT_SERVER' is not contained in the choice
+package/openjdk/Config.in:131:warning: choice default symbol 'BR2_PACKAGE_OPENJDK_JVM_VARIANT_ZERO' is not contained in the choice
+package/openjdk/Config.in:132:warning: choice default symbol 'BR2_PACKAGE_OPENJDK_JVM_VARIANT_ZERO' is not contained in the choice
+package/python3/Config.in:23:warning: choice default symbol 'BR2_PACKAGE_PYTHON3_PYC_ONLY' is not contained in the choice
+package/libmad/Config.in:14:warning: choice default symbol 'BR2_PACKAGE_LIBMAD_OPTIMIZATION_DEFAULT' is not contained in the choice
+package/zlib/Config.in:23:warning: choice default symbol 'BR2_PACKAGE_LIBZLIB' is not contained in the choice
+package/jpeg/Config.in:19:warning: choice default symbol 'BR2_PACKAGE_JPEG_TURBO' is not contained in the choice
+package/libmediaart/Config.in:21:warning: choice default symbol 'BR2_PACKAGE_LIBMEDIAART_BACKEND_GDK_PIXBUF' is not contained in the choice
+package/open62541/Config.in:12:warning: choice default symbol 'BR2_PACKAGE_OPEN62541_ENCRYPTION_NONE' is not contained in the choice
+package/apache/Config.in:22:warning: choice default symbol 'BR2_PACKAGE_APACHE_MPM_WORKER' is not contained in the choice
+package/connman/Config.in:22:warning: choice default symbol 'BR2_PACKAGE_CONNMAN_IPTABLES' is not contained in the choice
+package/rygel/Config.in:43:warning: choice default symbol 'BR2_PACKAGE_RYGEL_MEDIA_ENGINE_SIMPLE' is not contained in the choice
+package/strongswan/Config.in:32:warning: choice default symbol 'BR2_PACKAGE_STRONGSWAN_GMP' is not contained in the choice
+package/xenomai/Config.in:97:warning: choice default symbol 'BR2_PACKAGE_XENOMAI_MERCURY' is not contained in the choice
+package/refpolicy/Config.in:35:warning: choice default symbol 'BR2_PACKAGE_REFPOLICY_UPSTREAM_VERSION' is not contained in the choice
+package/refpolicy/Config.in:78:warning: choice default symbol 'BR2_PACKAGE_REFPOLICY_POLICY_STATE_PERMISSIVE' is not contained in the choice
+package/xvisor/Config.in:24:warning: choice default symbol 'BR2_PACKAGE_XVISOR_USE_DEFCONFIG' is not contained in the choice
+make[1]: Leaving directory '/home/builder/work/rg353v-custom/buildroot'
+[7m>>> host-bison 3.8.2 Downloading[27m
+wget --passive-ftp -nd -t 3 -O '/home/builder/work/rg353v-custom/buildroot/output/build/.bison-3.8.2.tar.xz.zFfBFW/output' 'http://ftpmirror.gnu.org/bison/bison-3.8.2.tar.xz' 
+--2025-12-29 03:34:28--  http://ftpmirror.gnu.org/bison/bison-3.8.2.tar.xz
+Resolving ftpmirror.gnu.org (ftpmirror.gnu.org)... 209.51.188.200, 2001:470:142:5::200
+Connecting to ftpmirror.gnu.org (ftpmirror.gnu.org)|209.51.188.200|:80... connected.
+HTTP request sent, awaiting response... 

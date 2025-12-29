@@ -8,15 +8,9 @@ services:
         USER_UID: 501
         USER_GID: 20
     volumes:
-      # Mount the ENTIRE project directory
+      # Just mount the entire project directory
+      # No separate volume for dl/ - simpler and avoids permission issues
       - .:/home/builder/work
-      # Persist the download directory (saves bandwidth)
-      # FIXED: Point to the ACTUAL buildroot directory, not buildroot-2024.02.1
-      - buildroot-dl:/home/builder/work/rg353v-custom/buildroot/dl
     working_dir: /home/builder/work
     tty: true
     stdin_open: true
-
-volumes:
-  buildroot-dl:
-    driver: local
