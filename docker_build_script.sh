@@ -160,6 +160,9 @@ echo "=========================================="
 echo "Building RG353V Firmware"
 echo "=========================================="
 
+# Fix permissions on the download directory (volume might be owned by root)
+sudo chown -R builder:builder /home/builder/work/rg353v-custom/buildroot/buildroot-2024.02.1/dl 2>/dev/null || true
+
 # Navigate to buildroot directory
 cd /home/builder/work/rg353v-custom/buildroot/buildroot-2024.02.1
 

@@ -6,13 +6,7 @@ services:
     volumes:
       # Mount the ENTIRE project directory
       - .:/home/builder/work
-      # Persist the download directory (saves bandwidth)
-      - buildroot-dl:/home/builder/work/rg353v-custom/buildroot/buildroot-2024.02.1/dl
     working_dir: /home/builder/work
     tty: true
     stdin_open: true
     user: builder
-
-volumes:
-  buildroot-dl:
-    driver: local
