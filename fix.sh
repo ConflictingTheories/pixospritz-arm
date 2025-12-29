@@ -1,100 +1,102 @@
 #!/bin/bash
-# Complete fix for macOS binary issue
+# Fix the defconfig to use a working toolchain configuration
 
 set -e
 
 echo "=========================================="
-echo "Fixing macOS Binary Issue"
+echo "Fixing Toolchain Configuration"
 echo "=========================================="
 echo ""
-echo "Problem: Buildroot has macOS binaries that can't run in Linux Docker"
-echo "Solution: Clean output directory and rebuild in Docker"
+echo "Problem: External toolchain path is broken"
+echo "Solution: Use Buildroot's internal toolchain (more reliable)"
 echo ""
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Step 1: Clean the output directory on the host
-echo "Step 1: Cleaning buildroot output directory..."
-if [ -d "$SCRIPT_DIR/rg353v-custom/buildroot/output" ]; then
-    rm -rf "$SCRIPT_DIR/rg353v-custom/buildroot/output"
-    echo "  ✓ Removed output/"
-fi
+# Create a corrected defconfig
+cat > "$SCRIPT_DIR/rg353v-custom/configs/rg353v_defconfig" << 'EOF'
+# Architecture
+BR2_aarch64=y
+BR2_cortex_a55=y
 
-if [ -f "$SCRIPT_DIR/rg353v-custom/buildroot/.config" ]; then
-    rm -f "$SCRIPT_DIR/rg353v-custom/buildroot/.config"
-    rm -f "$SCRIPT_DIR/rg353v-custom/buildroot/.config.old"
-    rm -f "$SCRIPT_DIR/rg353v-custom/buildroot/..config.tmp"
-    rm -f "$SCRIPT_DIR/rg353v-custom/buildroot/.defconfig"
-    echo "  ✓ Removed config files"
-fi
+# System
+BR2_SYSTEM_DHCP="eth0"
 
-# Step 2: Update docker-build.sh
-echo ""
-echo "Step 2: Updating docker-build.sh..."
-cat > "$SCRIPT_DIR/docker-build.sh" << 'BUILD_SCRIPT_EOF'
-#!/bin/bash
-set -e
+# Use INTERNAL toolchain (more reliable than external)
+BR2_TOOLCHAIN_BUILDROOT=y
+BR2_TOOLCHAIN_BUILDROOT_GLIBC=y
+BR2_TOOLCHAIN_BUILDROOT_CXX=y
 
-echo "=========================================="
-echo "Building RG353V Firmware"
-echo "=========================================="
+# Kernel
+BR2_LINUX_KERNEL=y
+BR2_LINUX_KERNEL_CUSTOM_VERSION=y
+BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE="6.1.50"
+BR2_LINUX_KERNEL_USE_CUSTOM_CONFIG=y
+BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="$(BR2_EXTERNAL_RG353V_PATH)/board/rg353v/linux.config"
+BR2_LINUX_KERNEL_DTS_SUPPORT=y
+BR2_LINUX_KERNEL_INTREE_DTS_NAME="rockchip/rk3566-anbernic-rg353v"
+BR2_LINUX_KERNEL_NEEDS_HOST_OPENSSL=y
 
-# GO TO THE ACTUAL BUILDROOT DIRECTORY
-cd /home/builder/work/rg353v-custom/buildroot
+# U-Boot
+BR2_TARGET_UBOOT=y
+BR2_TARGET_UBOOT_BUILD_SYSTEM_KCONFIG=y
+BR2_TARGET_UBOOT_CUSTOM_VERSION=y
+BR2_TARGET_UBOOT_CUSTOM_VERSION_VALUE="2023.07"
+BR2_TARGET_UBOOT_BOARD_DEFCONFIG="anbernic-rg353v-rk3566"
+BR2_TARGET_UBOOT_NEEDS_DTC=y
+BR2_TARGET_UBOOT_NEEDS_PYTHON3=y
+BR2_TARGET_UBOOT_NEEDS_PYLIBFDT=y
+BR2_TARGET_UBOOT_NEEDS_OPENSSL=y
+BR2_TARGET_UBOOT_FORMAT_BIN=y
+BR2_TARGET_UBOOT_SPL=y
+BR2_TARGET_UBOOT_SPL_NAME="u-boot-spl.bin"
 
-if [ "$1" = "clean" ]; then
-    echo "Performing distclean (complete clean)..."
-    make BR2_EXTERNAL=/home/builder/work/rg353v-custom distclean || true
-fi
+# Rockchip tools
+BR2_PACKAGE_HOST_UBOOT_TOOLS=y
 
-# Apply defconfig with correct BR2_EXTERNAL path
-echo "Applying rg353v_defconfig..."
-make BR2_EXTERNAL=/home/builder/work/rg353v-custom rg353v_defconfig
+# Filesystem
+BR2_TARGET_ROOTFS_EXT2=y
+BR2_TARGET_ROOTFS_EXT2_4=y
+BR2_TARGET_ROOTFS_EXT2_SIZE="512M"
 
-echo ""
-echo "Build configuration:"
-echo "  Target: ARM64 (Cortex-A55)"
-echo "  Toolchain: Bootlin external"
-echo "  Kernel: 6.1.50"
-echo "  U-Boot: 2023.07"
-echo ""
+# Basic packages
+BR2_PACKAGE_BUSYBOX=y
+BR2_PACKAGE_BUSYBOX_SHOW_OTHERS=y
+EOF
 
-NUM_CORES=$(nproc)
-echo "Building with $NUM_CORES CPU cores..."
-echo "This will take 30-45 minutes on first build."
-echo ""
+echo "✓ Created corrected defconfig with internal toolchain"
 
-# Build
-make BR2_EXTERNAL=/home/builder/work/rg353v-custom -j$NUM_CORES 2>&1 | tee /home/builder/work/build.log
+# Make sure the linux.config has minimal working content
+cat > "$SCRIPT_DIR/rg353v-custom/board/rg353v/linux.config" << 'LINUX_EOF'
+CONFIG_ARM64=y
+CONFIG_ARCH_ROCKCHIP=y
+CONFIG_SERIAL_8250=y
+CONFIG_SERIAL_8250_CONSOLE=y
+CONFIG_SERIAL_OF_PLATFORM=y
+CONFIG_EXT4_FS=y
+CONFIG_TMPFS=y
+CONFIG_DEVTMPFS=y
+CONFIG_DEVTMPFS_MOUNT=y
+CONFIG_PROC_FS=y
+CONFIG_SYSFS=y
+LINUX_EOF
 
-if [ ${PIPESTATUS[0]} -eq 0 ]; then
-    echo ""
-    echo "=========================================="
-    echo "✓ Build Complete!"
-    echo "=========================================="
-    echo ""
-    echo "Output images:"
-    ls -lh output/images/
-else
-    echo ""
-    echo "✗ Build Failed - check build.log"
-    exit 1
-fi
-BUILD_SCRIPT_EOF
-
-chmod +x "$SCRIPT_DIR/docker-build.sh"
-echo "  ✓ docker-build.sh updated"
+echo "✓ Updated linux.config"
 
 echo ""
 echo "=========================================="
-echo "✓ Fix Complete!"
+echo "✓ Defconfig Fixed!"
 echo "=========================================="
 echo ""
-echo "The macOS artifacts have been cleaned."
-echo "Now build INSIDE Docker (not on your Mac!):"
+echo "Changes made:"
+echo "  - Switched from external to INTERNAL toolchain"
+echo "  - Internal toolchain is built by Buildroot (more reliable)"
+echo "  - Will take longer but should work"
 echo ""
-echo "  docker-compose run --rm buildroot /home/builder/work/docker-build.sh"
+echo "Now clean and rebuild:"
+echo "  1. Clean old build:"
+echo "     rm -rf rg353v-custom/buildroot/output"
 echo ""
-echo "IMPORTANT: Don't run 'make' directly on your Mac!"
-echo "Always build inside the Docker container."
+echo "  2. Rebuild:"
+echo "     docker-compose run --rm buildroot /home/builder/work/docker-build.sh"
 echo ""
