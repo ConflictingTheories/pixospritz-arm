@@ -1,57 +1,38 @@
 #!/bin/bash
-# This script runs INSIDE the Docker container
-# It's designed to be run multiple times without issues
-
 set -e
 
 echo "=========================================="
 echo "Building RG353V Firmware"
 echo "=========================================="
 
-# Navigate to buildroot directory
-cd /home/builder/work/rg353v-custom/buildroot/buildroot-2024.02.1
+# GO TO THE ACTUAL BUILDROOT DIRECTORY
+cd /home/builder/work/rg353v-custom/buildroot
 
-# Clean previous build artifacts to ensure clean state
-chown -R root:root output 2>/dev/null || true
-rm -f .config
-rm -rf output 2>/dev/null || true
-mkdir -p output
-mkdir -p output/build
-mkdir -p output/build/buildroot-config
-
-# Only clean if explicitly requested (additional cleanup)
 if [ "$1" = "clean" ]; then
-    echo "Performing clean build..."
-    make clean
+    echo "Performing distclean (complete clean)..."
+    make BR2_EXTERNAL=/home/builder/work/rg353v-custom distclean || true
 fi
 
-# Ensure the buildroot-config directory structure exists
-mkdir -p output/build/buildroot-config/lxdialog
-
-# Apply configuration
+# Apply defconfig with correct BR2_EXTERNAL path
 echo "Applying rg353v_defconfig..."
-make O=output BR2_EXTERNAL=/home/builder/work/rg353v-custom rg353v_defconfig
+make BR2_EXTERNAL=/home/builder/work/rg353v-custom rg353v_defconfig
 
-# Show configuration summary
 echo ""
 echo "Build configuration:"
 echo "  Target: ARM64 (Cortex-A55)"
-echo "  Toolchain: External (Bootlin)"
+echo "  Toolchain: Bootlin external"
 echo "  Kernel: 6.1.50"
 echo "  U-Boot: 2023.07"
 echo ""
 
-# Build with all available cores
 NUM_CORES=$(nproc)
 echo "Building with $NUM_CORES CPU cores..."
 echo "This will take 30-45 minutes on first build."
-echo "Subsequent builds will be much faster (incremental)."
 echo ""
 
-# Run the build and capture output
-make O=output -j$NUM_CORES 2>&1 | tee /home/builder/work/build.log
+# Build
+make BR2_EXTERNAL=/home/builder/work/rg353v-custom -j$NUM_CORES 2>&1 | tee /home/builder/work/build.log
 
-# Check if build succeeded
 if [ ${PIPESTATUS[0]} -eq 0 ]; then
     echo ""
     echo "=========================================="
@@ -59,15 +40,9 @@ if [ ${PIPESTATUS[0]} -eq 0 ]; then
     echo "=========================================="
     echo ""
     echo "Output images:"
-    ls -lh output/images/ 2>/dev/null || echo "No images found in output/images/"
-    echo ""
-    echo "Files are in: rg353v-custom/buildroot/buildroot-2024.02.1/output/images/"
+    ls -lh output/images/
 else
     echo ""
-    echo "=========================================="
-    echo "✗ Build Failed!"
-    echo "=========================================="
-    echo ""
-    echo "Check the build log at: build.log"
+    echo "✗ Build Failed - check build.log"
     exit 1
 fi

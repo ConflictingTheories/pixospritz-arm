@@ -1,0 +1,1 @@
+BR2_EXTERNAL_RG353V_PATH := $(dir $(lastword $(MAKEFILE_LIST)))

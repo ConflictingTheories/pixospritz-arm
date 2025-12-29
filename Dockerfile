@@ -1,8 +1,10 @@
 FROM debian:bookworm-slim
 
-# Install ALL required dependencies in one layer
-# This is the complete list for Buildroot + U-Boot + Kernel
+
+
 RUN apt-get update && apt-get install -y \
+    # Sudo for non-root user
+    sudo \
     # Core build tools
     build-essential \
     gcc \
@@ -50,23 +52,31 @@ RUN apt-get update && apt-get install -y \
     vim-tiny \
     less \
     && rm -rf /var/lib/apt/lists/*
-
+# Accept build arguments for UID/GID
+ARG USER_UID=1000
+ARG USER_GID=1000
 # Install Python packages for U-Boot
-# Use system packages first (preferred), then pip for missing ones
 RUN apt-get update && apt-get install -y \
     python3-pyelftools \
     python3-setuptools \
     && rm -rf /var/lib/apt/lists/*
 
-# pylibfdt might not be in system packages, install via pip with override
 RUN pip3 install --break-system-packages --no-cache-dir pylibfdt || \
     echo "pylibfdt install failed, will try during build"
 
-# Create non-root user for safer builds
-RUN useradd -m -s /bin/bash builder && \
+# Create builder user with MATCHING UID from host
+# Handle the case where GID might already exist (like macOS GID 20)
+RUN set -ex; \
+    # Create group only if it doesn't exist
+    if ! getent group ${USER_GID} > /dev/null 2>&1; then \
+        groupadd -g ${USER_GID} builder; \
+    fi; \
+    # Create user with the specified UID and GID (even if group already exists)
+    useradd -m -u ${USER_UID} -g ${USER_GID} -s /bin/bash builder; \
+    # Give sudo access
     echo "builder ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
-# Set locale (prevents encoding issues)
+# Set locale
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y locales && \
     sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && \
     locale-gen en_US.UTF-8 && \

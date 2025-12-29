@@ -1,11 +1,22 @@
+version: '3.8'
+
 services:
   buildroot:
-    build: .
+    build:
+      context: .
+      args:
+        USER_UID: 501
+        USER_GID: 20
     volumes:
       # Mount the ENTIRE project directory
       - .:/home/builder/work
+      # Persist the download directory (saves bandwidth)
+      # FIXED: Point to the ACTUAL buildroot directory, not buildroot-2024.02.1
+      - buildroot-dl:/home/builder/work/rg353v-custom/buildroot/dl
     working_dir: /home/builder/work
     tty: true
     stdin_open: true
-    user: root
 
+volumes:
+  buildroot-dl:
+    driver: local

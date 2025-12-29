@@ -1,277 +1,230 @@
 #!/bin/bash
-# Improved Docker-based build for RG353V
-# Fixes all the issues from the old Dockerfile
+# ACTUAL FIX - Creates the missing BR2_EXTERNAL structure and defconfig
 
 set -e
 
 echo "=========================================="
-echo "RG353V Docker Build Setup (IMPROVED)"
+echo "RG353V Build Structure Diagnostic & Fix"
 echo "=========================================="
-echo ""
-echo "This version fixes:"
-echo "  ✓ Uses Debian (more stable than Ubuntu for Buildroot)"
-echo "  ✓ Doesn't pre-download Buildroot (causes cache issues)"
-echo "  ✓ Doesn't pre-configure (causes stale config problems)"
-echo "  ✓ Better package versions and dependencies"
-echo "  ✓ Proper volume mounting for iterative builds"
 echo ""
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Check if Docker is installed
-if ! command -v docker >/dev/null 2>&1; then
-    echo "ERROR: Docker is not installed!"
-    echo "Install: https://www.docker.com/products/docker-desktop"
-    exit 1
-fi
-
-if ! docker info >/dev/null 2>&1; then
-    echo "ERROR: Docker is not running!"
-    echo "Please start Docker Desktop and try again."
-    exit 1
-fi
-
-echo "✓ Docker is available"
+# Check what actually exists
+echo "Checking your directory structure..."
 echo ""
 
-# Create improved Dockerfile
-cat > "$SCRIPT_DIR/Dockerfile" << 'DOCKERFILE_EOF'
-FROM debian:bookworm-slim
+if [ -d "$SCRIPT_DIR/rg353v-custom" ]; then
+    echo "✓ rg353v-custom directory exists"
+    
+    if [ -d "$SCRIPT_DIR/rg353v-custom/buildroot" ]; then
+        echo "✓ buildroot directory exists"
+        
+        if [ -d "$SCRIPT_DIR/rg353v-custom/buildroot/buildroot-2024.02.1" ]; then
+            echo "✓ buildroot-2024.02.1 exists"
+        else
+            echo "✗ buildroot-2024.02.1 NOT FOUND"
+            echo "  You need to download and extract Buildroot 2024.02.1"
+            exit 1
+        fi
+    else
+        echo "✗ buildroot directory NOT FOUND"
+        exit 1
+    fi
+else
+    echo "Creating rg353v-custom directory structure..."
+    mkdir -p "$SCRIPT_DIR/rg353v-custom"
+fi
 
-# Install ALL required dependencies in one layer
-# This is the complete list for Buildroot + U-Boot + Kernel
-RUN apt-get update && apt-get install -y \
-    # Core build tools
-    build-essential \
-    gcc \
-    g++ \
-    make \
-    # Buildroot essentials
-    git \
-    wget \
-    curl \
-    cpio \
-    unzip \
-    rsync \
-    bc \
-    file \
-    patch \
-    perl \
-    texinfo \
-    # Python (for U-Boot)
-    python3 \
-    python3-dev \
-    python3-pip \
-    python3-setuptools \
-    # Libraries
-    libncurses-dev \
-    libssl-dev \
-    libelf-dev \
-    # Build tools
-    bison \
-    flex \
-    gawk \
-    tar \
-    gzip \
-    bzip2 \
-    xz-utils \
-    sed \
-    grep \
-    diffutils \
-    findutils \
-    # Compression tools
-    lzip \
-    lzop \
-    # Device tree compiler
-    device-tree-compiler \
-    # Misc utilities
-    vim-tiny \
-    less \
-    && rm -rf /var/lib/apt/lists/*
+echo ""
+echo "Checking BR2_EXTERNAL structure..."
 
-# Install Python packages for U-Boot
-# Use system packages first (preferred), then pip for missing ones
-RUN apt-get update && apt-get install -y \
-    python3-pyelftools \
-    python3-setuptools \
-    && rm -rf /var/lib/apt/lists/*
+# Create the proper BR2_EXTERNAL tree structure
+BR2_EXT="$SCRIPT_DIR/rg353v-custom"
 
-# pylibfdt might not be in system packages, install via pip with override
-RUN pip3 install --break-system-packages --no-cache-dir pylibfdt || \
-    echo "pylibfdt install failed, will try during build"
+# Check/create configs directory
+if [ ! -d "$BR2_EXT/configs" ]; then
+    echo "Creating configs/ directory..."
+    mkdir -p "$BR2_EXT/configs"
+fi
 
-# Create non-root user for safer builds
-RUN useradd -m -s /bin/bash builder && \
-    echo "builder ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+# Check/create board directory
+if [ ! -d "$BR2_EXT/board/rg353v" ]; then
+    echo "Creating board/rg353v/ directory..."
+    mkdir -p "$BR2_EXT/board/rg353v"
+fi
 
-# Set locale (prevents encoding issues)
-RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y locales && \
-    sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && \
-    locale-gen en_US.UTF-8 && \
-    update-locale LANG=en_US.UTF-8 && \
-    rm -rf /var/lib/apt/lists/*
+# Create external.desc if missing
+if [ ! -f "$BR2_EXT/external.desc" ]; then
+    echo "Creating external.desc..."
+    cat > "$BR2_EXT/external.desc" << 'EOF'
+name: RG353V
+desc: Custom firmware for Anbernic RG353V handheld
+EOF
+fi
 
-ENV LANG=en_US.UTF-8
-ENV LANGUAGE=en_US:en
-ENV LC_ALL=en_US.UTF-8
+# Create external.mk if missing
+if [ ! -f "$BR2_EXT/external.mk" ]; then
+    echo "Creating external.mk..."
+    cat > "$BR2_EXT/external.mk" << 'EOF'
+include $(sort $(wildcard $(BR2_EXTERNAL_RG353V_PATH)/package/*/*.mk))
+EOF
+fi
 
-# Switch to builder user
-USER builder
-WORKDIR /home/builder
+# Create Config.in if missing
+if [ ! -f "$BR2_EXT/Config.in" ]; then
+    echo "Creating Config.in..."
+    cat > "$BR2_EXT/Config.in" << 'EOF'
+source "$BR2_EXTERNAL_RG353V_PATH/package/Config.in"
+EOF
+fi
 
-CMD ["/bin/bash"]
-DOCKERFILE_EOF
+# Create the defconfig file
+echo "Creating rg353v_defconfig..."
+cat > "$BR2_EXT/configs/rg353v_defconfig" << 'EOF'
+# Architecture
+BR2_aarch64=y
+BR2_cortex_a55=y
 
-echo "✓ Improved Dockerfile created"
+# System
+BR2_SYSTEM_DHCP="eth0"
 
-# Create docker-compose.yml
-cat > "$SCRIPT_DIR/docker-compose.yml" << 'COMPOSE_EOF'
-version: '3.8'
+# Toolchain
+BR2_TOOLCHAIN_EXTERNAL=y
+BR2_TOOLCHAIN_EXTERNAL_BOOTLIN=y
+BR2_TOOLCHAIN_EXTERNAL_BOOTLIN_AARCH64_GLIBC_STABLE=y
 
-services:
-  buildroot:
-    build: .
-    volumes:
-      # Mount the ENTIRE project directory
-      - .:/home/builder/work
-      # Persist the download directory (saves bandwidth)
-      - buildroot-dl:/home/builder/work/rg353v-custom/buildroot/buildroot-2024.02.1/dl
-    working_dir: /home/builder/work
-    tty: true
-    stdin_open: true
-    user: builder
+# Kernel
+BR2_LINUX_KERNEL=y
+BR2_LINUX_KERNEL_CUSTOM_VERSION=y
+BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE="6.1.50"
+BR2_LINUX_KERNEL_USE_CUSTOM_CONFIG=y
+BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="$(BR2_EXTERNAL_RG353V_PATH)/board/rg353v/linux.config"
+BR2_LINUX_KERNEL_DTS_SUPPORT=y
+BR2_LINUX_KERNEL_INTREE_DTS_NAME="rockchip/rk3566-anbernic-rg353v"
+BR2_LINUX_KERNEL_NEEDS_HOST_OPENSSL=y
 
-volumes:
-  buildroot-dl:
-    driver: local
-COMPOSE_EOF
+# U-Boot
+BR2_TARGET_UBOOT=y
+BR2_TARGET_UBOOT_BUILD_SYSTEM_KCONFIG=y
+BR2_TARGET_UBOOT_CUSTOM_VERSION=y
+BR2_TARGET_UBOOT_CUSTOM_VERSION_VALUE="2023.07"
+BR2_TARGET_UBOOT_BOARD_DEFCONFIG="anbernic-rg353v-rk3566"
+BR2_TARGET_UBOOT_NEEDS_DTC=y
+BR2_TARGET_UBOOT_NEEDS_PYTHON3=y
+BR2_TARGET_UBOOT_NEEDS_PYLIBFDT=y
+BR2_TARGET_UBOOT_NEEDS_OPENSSL=y
+BR2_TARGET_UBOOT_FORMAT_BIN=y
+BR2_TARGET_UBOOT_SPL=y
+BR2_TARGET_UBOOT_SPL_NAME="u-boot-spl.bin"
 
-echo "✓ docker-compose.yml created"
+# Rockchip tools
+BR2_PACKAGE_HOST_UBOOT_TOOLS=y
 
-# Create the build script - THIS IS THE KEY IMPROVEMENT
+# Filesystem
+BR2_TARGET_ROOTFS_EXT2=y
+BR2_TARGET_ROOTFS_EXT2_4=y
+BR2_TARGET_ROOTFS_EXT2_SIZE="512M"
+
+# Target packages
+BR2_PACKAGE_BUSYBOX_SHOW_OTHERS=y
+EOF
+
+echo "✓ defconfig created"
+
+# Create a minimal kernel config
+if [ ! -f "$BR2_EXT/board/rg353v/linux.config" ]; then
+    echo "Creating minimal linux.config..."
+    cat > "$BR2_EXT/board/rg353v/linux.config" << 'EOF'
+CONFIG_ARM64=y
+CONFIG_ARCH_ROCKCHIP=y
+CONFIG_ROCKCHIP_RK3566=y
+CONFIG_SERIAL_8250=y
+CONFIG_SERIAL_8250_CONSOLE=y
+CONFIG_SERIAL_OF_PLATFORM=y
+CONFIG_EXT4_FS=y
+CONFIG_TMPFS=y
+CONFIG_DEVTMPFS=y
+CONFIG_DEVTMPFS_MOUNT=y
+EOF
+    echo "✓ linux.config created"
+fi
+
+echo ""
+echo "=========================================="
+echo "Structure Created!"
+echo "=========================================="
+echo ""
+echo "Directory structure:"
+echo "  rg353v-custom/"
+echo "  ├── external.desc"
+echo "  ├── external.mk"
+echo "  ├── Config.in"
+echo "  ├── configs/"
+echo "  │   └── rg353v_defconfig  ← YOUR DEFCONFIG"
+echo "  └── board/"
+echo "      └── rg353v/"
+echo "          └── linux.config"
+echo ""
+
+# Now update the docker-build.sh script with correct paths
 cat > "$SCRIPT_DIR/docker-build.sh" << 'BUILD_SCRIPT_EOF'
 #!/bin/bash
-# This script runs INSIDE the Docker container
-# It's designed to be run multiple times without issues
-
 set -e
 
 echo "=========================================="
 echo "Building RG353V Firmware"
 echo "=========================================="
 
-# Fix permissions on the download directory (volume might be owned by root)
-sudo chown -R builder:builder /home/builder/work/rg353v-custom/buildroot/buildroot-2024.02.1/dl 2>/dev/null || true
-
-# Navigate to buildroot directory
 cd /home/builder/work/rg353v-custom/buildroot/buildroot-2024.02.1
 
-# Only clean if explicitly requested
 if [ "$1" = "clean" ]; then
     echo "Performing clean build..."
     make clean
 fi
 
-# Apply configuration
-echo "Applying rg353v_defconfig..."
-make BR2_EXTERNAL=/home/builder/work/rg353v-custom rg353v_defconfig
+# Set BR2_EXTERNAL to the parent directory (rg353v-custom)
+echo "Setting BR2_EXTERNAL=/home/builder/work/rg353v-custom"
+export BR2_EXTERNAL=/home/builder/work/rg353v-custom
 
-# Show configuration summary
+echo "Applying rg353v_defconfig..."
+make rg353v_defconfig
+
 echo ""
 echo "Build configuration:"
 echo "  Target: ARM64 (Cortex-A55)"
-echo "  Toolchain: External (Bootlin)"
+echo "  Toolchain: Bootlin external"
 echo "  Kernel: 6.1.50"
 echo "  U-Boot: 2023.07"
 echo ""
 
-# Build with all available cores
 NUM_CORES=$(nproc)
 echo "Building with $NUM_CORES CPU cores..."
-echo "This will take 30-45 minutes on first build."
-echo "Subsequent builds will be much faster (incremental)."
 echo ""
 
-# Run the build and capture output
 make -j$NUM_CORES 2>&1 | tee /home/builder/work/build.log
 
-# Check if build succeeded
 if [ ${PIPESTATUS[0]} -eq 0 ]; then
     echo ""
     echo "=========================================="
     echo "✓ Build Complete!"
     echo "=========================================="
     echo ""
-    echo "Output images:"
-    ls -lh output/images/ 2>/dev/null || echo "No images found in output/images/"
-    echo ""
-    echo "Files are in: rg353v-custom/buildroot/buildroot-2024.02.1/output/images/"
+    ls -lh output/images/
 else
     echo ""
-    echo "=========================================="
-    echo "✗ Build Failed!"
-    echo "=========================================="
-    echo ""
-    echo "Check the build log at: build.log"
+    echo "✗ Build Failed - check build.log"
     exit 1
 fi
 BUILD_SCRIPT_EOF
 
 chmod +x "$SCRIPT_DIR/docker-build.sh"
+echo "✓ Updated docker-build.sh with correct BR2_EXTERNAL path"
 
-echo "✓ Build script created"
-
-# Create helper scripts
-cat > "$SCRIPT_DIR/docker-shell.sh" << 'SHELL_EOF'
-#!/bin/bash
-# Open an interactive shell in the build container
-echo "Opening interactive shell in build container..."
-echo "You can run commands like:"
-echo "  cd rg353v-custom/buildroot/buildroot-2024.02.1"
-echo "  make menuconfig"
-echo "  make -j$(nproc)"
-docker-compose run --rm buildroot bash
-SHELL_EOF
-
-chmod +x "$SCRIPT_DIR/docker-shell.sh"
-
-cat > "$SCRIPT_DIR/docker-clean.sh" << 'CLEAN_EOF'
-#!/bin/bash
-# Clean build artifacts
-echo "Cleaning build artifacts..."
-docker-compose run --rm buildroot /home/builder/work/docker-build.sh clean
-echo "Clean complete!"
-CLEAN_EOF
-
-chmod +x "$SCRIPT_DIR/docker-clean.sh"
-
-echo "✓ Helper scripts created"
 echo ""
 echo "=========================================="
-echo "Setup Complete!"
+echo "NOW you can build:"
 echo "=========================================="
 echo ""
-echo "KEY IMPROVEMENTS over old Dockerfile:"
-echo "  ✓ Uses Debian Bookworm (more stable)"
-echo "  ✓ Runs as non-root user (safer)"
-echo "  ✓ Doesn't pre-configure (prevents stale configs)"
-echo "  ✓ Persistent download volume (faster rebuilds)"
-echo "  ✓ Incremental builds work properly"
-echo "  ✓ Better error handling"
+echo "  docker-compose run --rm buildroot /home/builder/work/docker-build.sh"
 echo ""
-echo "To build your firmware:"
-echo ""
-echo "  1. Build Docker image (first time only):"
-echo "     docker-compose build"
-echo ""
-echo "  2. Run the build:"
-echo "     docker-compose run --rm buildroot /home/builder/work/docker-build.sh"
-echo ""
-echo "  3. For clean build:"
-echo "     docker-compose run --rm buildroot /home/builder/work/docker-build.sh clean"
-echo ""
-echo "Helpful commands:"
-echo "  ./docker-shell.sh     - Open interactive shell"
-echo "  ./docker-clean.sh     - Clean build artifacts"
-echo ""
-echo "=========================================="
