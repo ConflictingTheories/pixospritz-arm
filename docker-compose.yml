@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   buildroot:
     build: .
@@ -9,4 +7,5 @@ services:
     working_dir: /home/builder/work
     tty: true
     stdin_open: true
-    user: builder
+    user: root
+

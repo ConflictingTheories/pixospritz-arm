@@ -200,6 +200,10 @@ define HOST_TAR_INSTALL_CMDS
 	@echo "tar already available in output/host/bin"
 endef
 
+define HOST_TAR_PATCH_CMDS
+	@echo "Skipping tar patching (using system tar)"
+endef
+
 $(eval $(host-generic-package))
 TAR_MK_EOF
 

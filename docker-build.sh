@@ -11,15 +11,26 @@ echo "=========================================="
 # Navigate to buildroot directory
 cd /home/builder/work/rg353v-custom/buildroot/buildroot-2024.02.1
 
-# Only clean if explicitly requested
+# Clean previous build artifacts to ensure clean state
+chown -R root:root output 2>/dev/null || true
+rm -f .config
+rm -rf output 2>/dev/null || true
+mkdir -p output
+mkdir -p output/build
+mkdir -p output/build/buildroot-config
+
+# Only clean if explicitly requested (additional cleanup)
 if [ "$1" = "clean" ]; then
     echo "Performing clean build..."
     make clean
 fi
 
+# Ensure the buildroot-config directory structure exists
+mkdir -p output/build/buildroot-config/lxdialog
+
 # Apply configuration
 echo "Applying rg353v_defconfig..."
-make BR2_EXTERNAL=/home/builder/work/rg353v-custom rg353v_defconfig
+make O=output BR2_EXTERNAL=/home/builder/work/rg353v-custom rg353v_defconfig
 
 # Show configuration summary
 echo ""
@@ -38,7 +49,7 @@ echo "Subsequent builds will be much faster (incremental)."
 echo ""
 
 # Run the build and capture output
-make -j$NUM_CORES 2>&1 | tee /home/builder/work/build.log
+make O=output -j$NUM_CORES 2>&1 | tee /home/builder/work/build.log
 
 # Check if build succeeded
 if [ ${PIPESTATUS[0]} -eq 0 ]; then
